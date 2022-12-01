@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <title>Assessment Score Calculator</title>
+    <link rel="icon" type="image/x-icon" href="https://images.emojiterra.com/twitter/v13.1/512px/1f4dd.png">
+    <style>
+        body {
+            background-color: #ebebeb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <br>
+    <div class="container">
+        <h1><b>Assessment Marks Calculator</b></h3>
+            <div id="insertmarks">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <button id="add" type="button" class="btn btn-success"> + Add Task</button>
+            </div>
+            <br>
+            <div class="row g-2">
+                <div class="col-auto">
+                    <div style="margin-bottom: 20px;">
+                        <button id="calculate" type="button" class="btn btn-primary">Calculate Result</button>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div style="margin-bottom: 20px;">
+                        <button id="clearall" type="button" class="btn btn-danger">Clear All</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 id="result"><b>Result</b>: ??%</h3>
+            <h3 id="expectedgrade"><b>Expected grade</b>: ?</h3>
+            <br>
+    </div>
+
+    <script>
+
+        let calculate = document.querySelector('#calculate');
+        let mark = document.querySelector('#mark');
+        let totalmark = document.querySelector('#totalmark');
+        let weighting = document.querySelector('#weighting');
+
+        function addinputs() {
+            let totaltasks;
+            let already = false
+            if (document.getElementById("insertmarks").innerHTML[0].includes('<')) {
+                totaltasks = document.getElementById("insertmarks").innerHTML.split('<div class="row g-2">').length - 1
+                already = true
+            } else {
+                totaltasks = 1
+            }
+            elements = []
+            for (var i = 0; i < totaltasks; i++) {
+                elements += '<div class="row g-2">'
+                    + '<div class="col-auto">'
+                    + '<h5>Assessment ' + (i + 1) + '</h5>'
+                    + '<p><i>' + (i == 0 ? '' : '(optional)') + '</i></p>'
+                    + '</div>'
+                    + '<div class="col-auto">'
+                    + '<input class="form-control" type="text" id="mark' + i + '" placeholder="Mark" type="range" min="1" max="100" ' + '></input>'
+                    + '</div>'
+                    + '<div class="col-auto">'
+                    + '<input class="form-control" type="text" id="totalmark' + i + '" placeholder="Total Mark" min="1" max="100" ' + '></input>'
+                    + '</div>'
+                    + '<div class="col-auto">'
+                    + '<input class="form-control" type="text" id="weighting' + i + '" placeholder="Weighting" min="1" max="100" ' + '></input>'
+                    + '</div>'
+                    + '<div class="col-auto">'
+                    + '<button id="clear' + i + '" type="button" class="btn btn-danger">Clear</button>'
+                    + '</div>'
+                    + '</div>'
+                    + '<br>'
+            }
+            document.getElementById("insertmarks").innerHTML = elements
+        }
+
+        window.onload = addinputs()
+        calculate.addEventListener('click', () => {
+            let totalweighting = 0
+            let currentgrade = 0
+            for (var i = 0; i < document.getElementById("insertmarks").innerHTML.split('<div class="row g-2">').length - 1; i++) {
+                thismark = parseFloat(document.getElementById("mark" + i).value)
+                thistotalmark = parseFloat(document.getElementById("totalmark" + i).value)
+                thisweighting = parseFloat(document.getElementById("weighting" + i).value)
+                if (!(!thismark || !thistotalmark || !thisweighting || thismark < 1 || thismark > 100 || thistotalmark < 1 || thistotalmark > 100 || thisweighting < 1 || thisweighting > 100)) {
+                    markpercentage = thismark / thistotalmark
+                    totalweighting += thisweighting
+                    currentgrade += markpercentage * thisweighting
+                }
+            }
+            currentgrade = currentgrade * 100 / totalweighting
+            let expectedgrade2;
+            if (isNaN(currentgrade)) {
+                currentgrade = '??'
+                expectedgrade2 = '?'
+            } else if (currentgrade >= 85) {
+                expectedgrade2 = 'A'
+            } else if (currentgrade >= 75) {
+                expectedgrade2 = 'B'
+            } else {
+                expectedgrade2 = '<B'
+            }
+            document.getElementById("result").innerHTML = '<h3 id="result"><b>Result</b>: ' + currentgrade + '%</h3>'
+            document.getElementById("expectedgrade").innerHTML = '<h3 id="expectedgrade"><b>Expected grade</b>: ' + expectedgrade2 + '</h3>'
+        });
+
+        function updateclear() {
+            for (var i2 = 0; i2 < document.getElementById("insertmarks").innerHTML.split('<div class="row g-2">').length - 1; i2++) {
+                eval(`clear` + i2 + `.addEventListener('click', () =>{
+    document.getElementById("mark" + ` + i2 + `).value=null
+    document.getElementById("totalmark" + ` + i2 + `).value=null
+    document.getElementById("weighting" + ` + i2 + `).value=null
+    });`)
+            }
+        }
+        updateclear()
+
+        add.addEventListener('click', () => {
+            i = document.getElementById("insertmarks").innerHTML.split('<div class="row g-2">').length - 1
+            document.getElementById("insertmarks").innerHTML += '<div class="row g-2">'
+                + '<div class="col-auto">'
+                + '<h5>Assessment ' + (i + 1) + '</h5>'
+                + '<p><i>' + (i == 0 ? '' : '(optional)') + '</i></p>'
+                + '</div>'
+                + '<div class="col-auto">'
+                + '<input class="form-control" type="text" id="mark' + i + '" placeholder="Mark" type="range" min="1" max="100"></input>'
+                + '</div>'
+                + '<div class="col-auto">'
+                + '<input class="form-control" type="text" id="totalmark' + i + '" placeholder="Total Mark" min="1" max="100"></input>'
+                + '</div>'
+                + '<div class="col-auto">'
+                + '<input class="form-control" type="text" id="weighting' + i + '" placeholder="Weighting" min="1" max="100"></input>'
+                + '</div>'
+                + '<div class="col-auto">'
+                + '<button id="clear' + i + '" type="button" class="btn btn-danger">Clear</button>'
+                + '</div>'
+                + '</div>'
+                + '<br>'
+            updateclear()
+        });
+
+        clearall.addEventListener('click', () => {
+            addinputs()
+            document.getElementById("result").innerHTML = '<h3 id="result"><b>Result</b>: ' + '??' + '%</h3>'
+            document.getElementById("expectedgrade").innerHTML = '<h3 id="expectedgrade"><b>Expected grade</b>: ' + '?' + '</h3>'
+        });
+    </script>
+</body>
+
+</html>
